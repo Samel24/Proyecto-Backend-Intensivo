@@ -1,0 +1,69 @@
+<%- include('../components/nav'); %>
+
+    <section class="container mt-5">
+
+        <% if (alerta===true) { %>
+            <% if (tipo==="success" ) { %>
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>
+                  <%= mensaje %>
+                </strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              <% } else { %>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  <strong>
+                    <%= mensaje %>
+                  </strong>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+        <% }} %>
+
+        <h1 class="mb-3">Listado de Sedes de la Universidad</h1>
+        <a href="/sedes/vista/crear" class="mb-5 btn btn-primary">Agregar Nueva Sede</a>
+        <table class="table table-striped table-hover ">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Ubicación</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% sedes.forEach((sede)=> { %>
+
+                    <tr>
+                        <td scope="row">
+                            <%= sede.id %>
+                        </td>
+                        <td>
+                            <%= sede.nombre %>
+                        </td>
+                        <td>
+                            <%= sede.ubicacion %>
+                        </td>
+                        <td><form method="DELETE" action="/sedes/vistas/eliminar/<%= sede.id %>">
+                            <div>
+                              <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </div>
+                          </form></td>
+                    </tr>
+
+                    <% }) %>
+            </tbody>
+        </table>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
