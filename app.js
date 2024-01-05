@@ -10,6 +10,12 @@ require('./config/connection');
 var index = require('./routes/index');
 var estudiantes = require('./routes/estudiantes.routes');
 var usuarios = require('./routes/usuarios.routes');
+var carreras = require('./routes/carreras.routes');
+var sedes = require('./routes/sedes.routes');
+var catedras = require('./routes/catedras.routes');
+var profesores = require('./routes/profesores.routes');
+var empleados = require('./routes/empleados.routes');
+var eventos = require('./routes/eventos.routes');
 
 var app = express();
 
@@ -27,6 +33,12 @@ app.use(cookieParser());
 app.use('/', index);
 app.use('/estudiantes', estudiantes);
 app.use('/usuarios', usuarios);
+app.use('/carreras', carreras);
+app.use('/sedes', sedes);
+app.use('/catedras', catedras);
+app.use('/profesores', profesores);
+app.use('/empleados', empleados);
+app.use('/eventos', eventos);
 
 // Middleware para manejar rutas no encontradas y devolver error 404
 app.use((req, res, next) => {
