@@ -1,10 +1,9 @@
-const { v4: uuidv4 } = require('uuid');
 const query = require('../config/query'); // Importamos la función para realizar consultas a la BD
 
 class Estudiante {
 
     listar() {
-        return new Promise( async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 const sql = 'SELECT * FROM estudiantes';
                 const response = await query(sql);
@@ -24,7 +23,7 @@ class Estudiante {
     }
 
     agregar(estudiante) {
-        return new Promise( async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 if (!estudiante.nombre || !estudiante.edad || !estudiante.carrera) {
                     return reject('Debes ingresar propiedades como: nombre, edad y carrera')
@@ -47,15 +46,29 @@ class Estudiante {
                     }
                 }
 
-                const values = [estudiante.nombre, estudiante.edad, estudiante.carrera]
+                const sql1 = 'SELECT nombre FROM carreras';
+                const carreras = await query(sql1);
 
-                const sql2 = 'INSERT INTO estudiantes (nombre, edad, carrera) VALUES (?, ?, ?)';
-                await query(sql2, values);
+                for (let i = 0; i < carreras.length; i++) {
+                    if (carreras[i].nombre === estudiante.carrera) {
+                        const values = [estudiante.nombre, estudiante.edad, estudiante.carrera]
+                        const sql2 = 'INSERT INTO estudiantes (nombre, edad, carrera) VALUES (?, ?, ?)';
+                        await query(sql2, values);
 
-                return resolve({
-                    ok: true,
-                    estudiante_agregado: estudiante
+                        return resolve({
+                            ok: true,
+                            estudiante_agregado: estudiante
+                        })
+                    }
+                }
+
+                return reject({
+                    ok: false,
+                    mensaje: 'Debes ingresar una carrera válida en la cual el estudiante pueda graduarse',
+                    carrera_valida: carreras
                 })
+
+
             } catch (error) {
                 console.error('Error al agregar el Estudiante:', error)
                 return reject({
@@ -66,15 +79,15 @@ class Estudiante {
         })
     }
 
-    mostrar(id){
-        return new Promise( async (resolve, reject) => {
+    mostrar(id) {
+        return new Promise(async (resolve, reject) => {
             try {
                 const sql = 'SELECT id, nombre, edad, carrera FROM estudiantes WHERE id=?';
                 const estudiante = await query(sql, Number(id));
 
                 if (estudiante.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "no se encontro el estudiante que estas buscando"
                     })
                 }
@@ -94,15 +107,15 @@ class Estudiante {
     }
 
     /*Nuevo controlador de la clase */
-    mostrarCarrera(carrera){
-        return new Promise( async (resolve, reject) => {
+    mostrarCarrera(carrera) {
+        return new Promise(async (resolve, reject) => {
             try {
                 const sql = 'SELECT id, nombre, edad, carrera FROM estudiantes WHERE carrera=?';
                 const estudiantes = await query(sql, carrera);
 
                 if (estudiantes.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "No hay estudiantes registrados en esta carrera"
                     })
                 }
@@ -122,8 +135,8 @@ class Estudiante {
     }
 
     /*Nuevo controlador de la clase */
-    mostrarRango(rangomin, rangomax){
-        return new Promise( async (resolve, reject) => {
+    mostrarRango(rangomin, rangomax) {
+        return new Promise(async (resolve, reject) => {
             try {
                 if (rangomin > rangomax) {
                     return reject({
@@ -138,7 +151,7 @@ class Estudiante {
 
                 if (estudiantes.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "No hay estudiantes registrados en este rango de edad"
                     })
                 }
@@ -158,15 +171,15 @@ class Estudiante {
     }
 
     /*Nuevo controlador de la clase */
-    mostrarUltimos(){
-        return new Promise( async (resolve, reject) => {
+    mostrarUltimos() {
+        return new Promise(async (resolve, reject) => {
             try {
                 const sql = 'SELECT * FROM estudiantes ORDER BY id DESC LIMIT 5';
                 const estudiantes = await query(sql);
 
                 if (estudiantes.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "No hay estudiantes registrados"
                     })
                 }
@@ -186,10 +199,10 @@ class Estudiante {
     }
 
     editar(estudiante, id) {
-        return new Promise( async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
-                if (!estudiante.nombre || !estudiante.edad || !estudiante.carrera) {
-                    return reject('Debes ingresar propiedades como: nombre, edad y carrera')
+                if (!estudiante.nombre || !estudiante.edad) {
+                    return reject('Debes ingresar propiedades como: nombre, edad')
                 }
 
                 if (Number.isInteger(estudiante.edad) === false) {
@@ -204,7 +217,7 @@ class Estudiante {
                 const estudiantes = await query(sql);
 
                 for (let i = 0; i < estudiantes.length; i++) {
-                    if (estudiantes[i].edad === estudiante.edad && estudiantes[i].nombre === estudiante.nombre && estudiantes[i].carerra === estudiante.carerra) {
+                    if (estudiantes[i].edad === estudiante.edad && estudiantes[i].nombre === estudiante.nombre) {
                         return reject('Este estudiante ya esta registrado con los mismos datos, debes cambiarlos')
                     }
                 }
@@ -214,14 +227,14 @@ class Estudiante {
 
                 if (estudiante_buscado.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "no se encontro el estudiante que estas buscando editar"
                     })
                 }
 
-                const values = [id, estudiante.nombre, estudiante.edad, estudiante.carrera, id]
-                const sql3 = 'UPDATE estudiantes SET id=?,nombre=?,edad=?,carrera=? WHERE id=?';
-                const response = await query(sql3, values);
+                const values = [id, estudiante.nombre, estudiante.edad, id]
+                const sql3 = 'UPDATE estudiantes SET id=?,nombre=?,edad=? WHERE id=?';
+                await query(sql3, values);
 
                 return resolve({
                     ok: true,
@@ -237,15 +250,15 @@ class Estudiante {
         })
     }
 
-    eliminar(id){
-        return new Promise( async (resolve, reject) => {
+    eliminar(id) {
+        return new Promise(async (resolve, reject) => {
             try {
                 const sql = 'SELECT id, nombre, edad, carrera FROM estudiantes WHERE id=?';
                 const estudiante = await query(sql, Number(id));
 
                 if (estudiante.length === 0) {
                     return reject({
-                        ok:false,
+                        ok: false,
                         mensaje: "no se encontro el estudiante que estas buscando"
                     })
                 }
